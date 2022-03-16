@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE-edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+
+        <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+
+        <script>
+            async function getAccount() {
+                try {
+                    const eth = window.ethereum;
+                    const payload = { 
+                        method: 'eth_requestAccounts',
+                    };
+                    const accounts = await eth.request(payload);
+                    const account = accounts[0];
+
+                    return account;
+                } catch (error) {
+                    setError(error);   
+                }
+            }
+
+            async function signin(account) {
+                try {
+                    const eth = window.ethereum;
+                    const payload = { 
+                        method: 'personal_sign',
+                        params: [ 'Eu sou o dono desta conta.', account ]
+                    };
+                    const sign = await eth.request(payload);
+                    return sign;
+                } catch (error) {
+                    setError(error);   
+                }
+            }
+            
+            async function recovery(sign) {
+                try {
+                    const eth = window.ethereum;
+                    const web3 = new Web3(window.ethereum);
+                    const recovered = web3.eth.accounts.recover("Eu sou o dono desta conta.", sign);
+                    return recovered;
+
+                } catch (error) {
+                    setError(error);   
+                }
+            }
+            async function init() {
+                    try {
+                        if (window.ethereum) {
+                            //const web3 = new Web3(window.ethereum);
+                            const account = await getAccount();
+                            const sign = await signin(account);
+                            const recovered = await recovery(sign);
+                        } else {
+                            alert('Você não possui carteira instalada. Favor instalar a carteira');
+                        }
+                    } catch (error) {
+                        setError(error);   
+                    }
+            }
+
+            init();
+        </script>
+    </body>
+</html>
